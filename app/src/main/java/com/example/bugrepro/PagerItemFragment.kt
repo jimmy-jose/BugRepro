@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.fragment_pager_item_list.*
 class PagerItemFragment : Fragment() {
 
     private var columnCount = 1
-    private var color = false
+    private var oneOrTwo = true
 
     private var listener: OnListFragmentInteractionListener? = null
 
@@ -35,7 +35,7 @@ class PagerItemFragment : Fragment() {
 
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
-            color = it.getBoolean(ARG_COLOR)
+            oneOrTwo = it.getBoolean(ARG_COLOR)
         }
     }
 
@@ -48,8 +48,8 @@ class PagerItemFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(color.toString(),PagerItemViewModel::class.java)
-        if (color)
+        viewModel = ViewModelProvider(this).get(oneOrTwo.toString(),PagerItemViewModel::class.java)
+        if (oneOrTwo)
             list.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorAccent))
         // Set the adapter
         if (list is RecyclerView) {
@@ -59,15 +59,15 @@ class PagerItemFragment : Fragment() {
                         columnCount <= 1 -> LinearLayoutManager(context)
                         else -> GridLayoutManager(context, columnCount)
                     }
-                adapter = if (color)
+                adapter = if (oneOrTwo)
                     MyPagerItemRecyclerViewAdapter(listener)
                 else
                     MyPagerItemRecyclerViewAdapter(listener)
             }
         }
-        viewModel.refresh(color)
+        viewModel.refresh(oneOrTwo)
         swipeToRefresh.setOnRefreshListener {
-            viewModel.refresh(color)
+            viewModel.refresh(oneOrTwo)
         }
 
         viewModel.listItems.observe(viewLifecycleOwner, Observer {
