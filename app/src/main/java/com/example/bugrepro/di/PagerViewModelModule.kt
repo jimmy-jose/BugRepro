@@ -8,7 +8,7 @@ import dagger.multibindings.IntoMap
 
 @Module
 abstract class PagerViewModelModule {
-//    @MainScope
+    @MainScope
     @Binds
     @IntoMap
     @ViewModelKey(PagerItemViewModel::class)
