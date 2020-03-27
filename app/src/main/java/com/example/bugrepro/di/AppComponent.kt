@@ -11,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 @Component(
     modules =
-    [AndroidSupportInjectionModule::class, ActivityBuilderModule::class, AppModule::class]
+    [AndroidSupportInjectionModule::class, ActivityBuilderModule::class, ViewModelFactoryModule::class, AppModule::class]
 )
 interface AppComponent : AndroidInjector<BugReproApplication> {
 

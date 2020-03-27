@@ -2,25 +2,27 @@ package com.example.bugrepro
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bugrepro.di.ViewModelProviderFactory
 import com.example.bugrepro.dummy.DummyContent.DummyItem
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_pager_item_list.*
+import javax.inject.Inject
 
 /**
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the
  * [PagerItemFragment.OnListFragmentInteractionListener] interface.
  */
-class PagerItemFragment : Fragment() {
+class PagerItemFragment : DaggerFragment() {
 
     private var columnCount = 1
     private var oneOrTwo = true
@@ -29,6 +31,8 @@ class PagerItemFragment : Fragment() {
 
     private lateinit var viewModel: PagerItemViewModel
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProviderFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,17 +52,18 @@ class PagerItemFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(oneOrTwo.toString(),PagerItemViewModel::class.java)
+        viewModel = ViewModelProvider(this,viewModelFactory).get(oneOrTwo.toString(),PagerItemViewModel::class.java)
         if (oneOrTwo)
             list.setBackgroundColor(ContextCompat.getColor(context!!, R.color.colorAccent))
         // Set the adapter
         if (list is RecyclerView) {
             with(list) {
                 layoutManager =
-                    when {
-                        columnCount <= 1 -> LinearLayoutManager(context)
-                        else -> GridLayoutManager(context, columnCount)
-                    }
+//                    when {
+//                        columnCount <= 1 ->
+                LinearLayoutManager(context)
+//                        else -> GridLayoutManager(context, columnCount)
+//                    }
                 adapter = if (oneOrTwo)
                     MyPagerItemRecyclerViewAdapter(listener)
                 else
@@ -67,7 +72,11 @@ class PagerItemFragment : Fragment() {
         }
         viewModel.refresh(oneOrTwo)
         swipeToRefresh.setOnRefreshListener {
-            viewModel.refresh(oneOrTwo)
+            (list.adapter as MyPagerItemRecyclerViewAdapter).setData(emptyList())
+            Handler().postDelayed({
+                viewModel.refresh(oneOrTwo)
+
+            },1000)
         }
 
         viewModel.listItems.observe(viewLifecycleOwner, Observer {

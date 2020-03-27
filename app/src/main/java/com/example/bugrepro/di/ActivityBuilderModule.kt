@@ -7,6 +7,9 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class ActivityBuilderModule {
 
-    @ContributesAndroidInjector
+//    @MainScope
+    @ContributesAndroidInjector(
+        modules = [PagerViewModelModule::class, MainFragmentBuildersModule::class]
+    )
     abstract fun contributeMainActivity(): MainActivity
 }
